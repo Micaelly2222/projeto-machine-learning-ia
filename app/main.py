@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .schemas import ProcessoInput, AnalysisResult
-from .analyzer import analyze_process
+from app.schemas import ProcessoInput, AnalysisResult
+from app.analyzer import analyze_process
 
 
 app = FastAPI(title="Sistema de Análise de Processos Judiciais")
