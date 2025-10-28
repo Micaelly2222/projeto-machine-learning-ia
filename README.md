@@ -1,54 +1,37 @@
-# ⚖️ Verificador de Processos Judiciais
+# ⚖️ Sistema de Análise de Processos Judiciais com Machine Learning
 
-Sistema automatizado para análise de processos judiciais usando IA, baseado em políticas empresariais.
+Sistema inteligente para análise e classificação automática de processos judiciais utilizando técnicas de Machine Learning e IA.
 
-## 🚀 Funcionalidades
+## 🚀 Funcionalidades Principais
 
-- **Análise Automatizada**: Decide entre `approved`, `rejected` ou `incomplete`
-- **Explicabilidade**: Justificativa detalhada com citações das políticas
-- **Interface Dupla**: API REST + Interface visual (Streamlit)
-- **Deploy Containerizado**: Pronto para produção com Docker
+- **🤖 Análise Automatizada com ML**: Classificação inteligente de processos  
+- **📊 Explicabilidade Completa**: Justificativas detalhadas das decisões  
+- **🌐 Múltiplas Interfaces**: API REST + Interface visual  
+- **🐳 Deploy Containerizado**: Pronto para produção com Docker  
 
-## 🛠️ Tecnologias
+## 🛠️ Tecnologias Utilizadas
 
-- **FastAPI**: API moderna com documentação automática
-- **LLM Integration**: Análise inteligente com Mistral (Ollama)
-- **Streamlit**: Interface visual intuitiva  
-- **Docker**: Containerização e deploy
-- **Pydantic**: Validação de dados robusta
+- **Python** – Linguagem de programação  
+- **FastAPI** – Framework para API web  
+- **Streamlit** – Framework para interface web  
+- **Docker** – Plataforma de containerização  
 
-## 📦 Estrutura do Projeto
+## 🏃‍♂️ Como Executar
 
-ml-process-verifier/
-├── app/
-│ ├── main.py # API FastAPI principal
-│ ├── analyzer.py # Lógica de análise (LLM + regras)
-│ └── schemas.py # Modelos de dados
-├── streamlit_app.py # Interface visual
-├── requirements.txt # Dependências
-├── Dockerfile # Configuração do container
-└── README.md # Esta documentação
+### Opção 1: Docker
+docker build -t projeto-machine-learning-ia .
 
+docker run -p 8000:8000 projeto-machine-learning-ia
 
-## 🏃‍♂️ Execução Local
-
-### Opção 1: Docker (Recomendado)
-
-```bash
-# Build da imagem
-docker build -t process-verifier .
-
-# Executar container
-docker run -p 8000:8000 process-verifier
-
-
-### Opção 2: Python Nativo
-
-# Instalar dependências
+### Opção 2: Desenvolvimento Local
 pip install -r requirements.txt
 
-# Executar API
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload --port 8000
 
-# Em outro terminal, executar interface
 streamlit run streamlit_app.py
+
+## 🌐 Acesso
+
+- **API:** http://localhost:8000  
+- **Documentação da API:** http://localhost:8000/docs  
+- **Interface Web:** http://localhost:8501
