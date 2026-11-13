@@ -1,133 +1,78 @@
-"""
-Interface visual para teste manual do verificador de processos.
-Permite inserir dados via JSON e visualizar resultados de forma intuitiva.
-"""
-import streamlit as st
-import requests
 import json
+from pathlib import Path
 
-# Configuração da página
-st.set_page_config(
-    page_title="Verificador de Processos",
-    page_icon="⚖️",
-    layout="wide"
-)
+import requests
+import streamlit as st
 
-# Título e descrição
-st.title("⚖️ Verificador de Processos Judiciais")
-st.markdown("""
-**Analise automaticamente processos judiciais usando IA**  
-Insira os dados do processo em JSON e receba uma decisão baseada nas políticas da empresa.
-""")
+from app.config import settings
 
-# Sidebar com informações
+EXAMPLES = json.loads((Path(__file__).parent / "data" / "cases.json").read_text(encoding="utf-8"))
+LABELS = {"approved": "Aprovado", "rejected": "Rejeitado", "incomplete": "Incompleto"}
+COLORS = {"approved": "green", "rejected": "red", "incomplete": "orange"}
+
+st.set_page_config(page_title="Análise de Processos Judiciais", layout="wide")
+st.title("Análise de Processos Judiciais")
+st.caption("Classificação de documentos com Machine Learning, extração de fatos e decisão por políticas.")
+
 with st.sidebar:
-    st.header("ℹ️ Como usar")
-    st.markdown("""
-    1. Cole os dados do processo em JSON no campo abaixo
-    2. Clique em **Analisar Processo** 
-    3. Veja a decisão automatizada com justificativa
-    """)
-    
-    st.header("📋 Políticas Aplicadas")
-    st.markdown("""
-    - POL-1: Trânsito em julgado obrigatório
-    - POL-2: Valor de condenação informado
-    - POL-3: Valor ≥ R$ 1.000,00
-    - POL-4: Não trabalhista
-    - POL-5: Sem óbito do autor
-    - POL-6: Sem substabelecimento
-    - POL-8: Documentação completa
-    """)
+    st.header("Políticas")
+    try:
+        for policy in requests.get(f"{settings.api_url}/policies", timeout=5).json():
+            st.markdown(f"**{policy['id']}** {policy['title']}")
+    except requests.RequestException:
+        st.warning("API indisponível. Rode `uvicorn app.main:app` antes.")
 
-# Área principal da aplicação
-col1, col2 = st.columns([2, 1])
+left, right = st.columns([3, 2])
 
-with col1:
-    st.subheader("📥 Dados do Processo")
-    
-    # Campo para entrada de dados
-    processo_json = st.text_area(
-        "Cole o JSON do processo aqui:",
-        height=400,
-        placeholder='{"numeroProcesso": "0001234-56.2023.4.05.8100", "classe": "...", ...}'
-    )
+with left:
+    example = st.selectbox("Carregar exemplo", ["(nenhum)"] + [e["name"] for e in EXAMPLES])
+    default = ""
+    if example != "(nenhum)":
+        chosen = next(e for e in EXAMPLES if e["name"] == example)
+        default = json.dumps(chosen["case"], indent=2, ensure_ascii=False)
+    payload = st.text_area("JSON do processo", value=default, height=480)
+    submit = st.button("Analisar", type="primary", use_container_width=True)
 
-with col2:
-    st.subheader("🎯 Resultado")
-    
-    # Botão de análise
-    if st.button("🔍 Analisar Processo", type="primary", use_container_width=True):
-        if processo_json:
-            try:
-                # Valida e parseia JSON
-                dados_processo = json.loads(processo_json)
-                
-                # Mostra spinner durante a análise
-                with st.spinner("Analisando processo com IA..."):
-                    response = requests.post(
-                        "http://localhost:8000/analyze", 
-                        json=dados_processo,
-                        timeout=30
-                    )
-                
-                if response.status_code == 200:
-                    resultado = response.json()
-                    
-                    # Exibe resultado com formatação visual
-                    st.success("✅ Análise concluída!")
-                    
-                    # Card de decisão colorido
-                    decision_color = {
-                        "approved": "🟢 APROVADO",
-                        "rejected": "🔴 REJEITADO", 
-                        "incomplete": "🟡 INCOMPLETO"
-                    }
-                    
-                    st.markdown(f"### {decision_color.get(resultado['decision'], '⚪')}")
-                    st.markdown(f"**Justificativa:** {resultado['rationale']}")
-                    
-                    # Políticas citadas
-                    st.markdown("**Políticas aplicadas:**")
-                    for citation in resultado.get('citations', []):
-                        st.code(citation)
-                        
-                    # JSON completo (expansível)
-                    with st.expander("Ver resposta completa em JSON"):
-                        st.json(resultado)
-                        
-                else:
-                    st.error(f"❌ Erro na API: {response.status_code} - {response.text}")
-                    
-            except json.JSONDecodeError:
-                st.error("❌ JSON inválido. Verifique a formatação.")
-            except requests.exceptions.ConnectionError:
-                st.error("❌ Não foi possível conectar à API. Verifique se o servidor está rodando.")
-            except Exception as e:
-                st.error(f"❌ Erro inesperado: {str(e)}")
-        else:
-            st.warning("⚠️ Por favor, insira os dados do processo em JSON.")
+with right:
+    if submit:
+        try:
+            response = requests.post(f"{settings.api_url}/analyze", json=json.loads(payload), timeout=90)
+        except json.JSONDecodeError:
+            st.error("JSON inválido.")
+            st.stop()
+        except requests.RequestException as exc:
+            st.error(f"Não foi possível chamar a API: {exc}")
+            st.stop()
 
-# Seção de exemplo
-with st.expander("📋 Exemplo de JSON válido"):
-    st.code("""
-{
-    "numeroProcesso": "0001234-56.2023.4.05.8100",
-    "classe": "Cumprimento de Sentença",
-    "orgaoJulgador": "19a VARA FEDERAL - SOBRAL/CE", 
-    "esfera": "Federal",
-    "valorCondenacao": 15000.00,
-    "documentos": [
-        {
-            "id": "DOC-1",
-            "nome": "Certidão de Trânsito em Julgado",
-            "texto": "..."
-        }
-    ],
-    "movimentos": []
-}
-""")
+        if response.status_code != 200:
+            st.error(f"Erro {response.status_code}")
+            st.json(response.json())
+            st.stop()
 
-# Rodapé
-st.markdown("---")
-st.markdown("*Desenvolvido para análise automatizada de processos judiciais*")
+        result = response.json()
+        decision = result["decision"]
+        st.markdown(f"### :{COLORS[decision]}[{LABELS[decision]}]")
+        st.write(result["rationale"])
+        st.markdown("**Políticas citadas:** " + ", ".join(result["citations"]))
+
+        st.subheader("Verificações")
+        st.dataframe(
+            [{"Política": c["policy"], "Regra": c["title"], "Passou": "sim" if c["passed"] else "não"}
+             for c in result["checks"]],
+            hide_index=True, use_container_width=True,
+        )
+
+        st.subheader("Documentos")
+        st.dataframe(
+            [{"ID": d["id"], "Nome": d["name"], "Tipo": d["document_type"], "Origem": d["type_source"],
+              "Confiança": d["classifier_confidence"], "Termos": ", ".join(d["top_terms"])}
+             for d in result["documents"]],
+            hide_index=True, use_container_width=True,
+        )
+
+        st.subheader("Evidências")
+        for e in result["evidence"]:
+            st.markdown(f"- **{e['policy']}** ({e['source']}): {e['excerpt']}")
+
+        with st.expander("Resposta completa"):
+            st.json(result)

@@ -1,34 +1,98 @@
-"""
-Definição dos modelos de dados (schemas) usando Pydantic.
-Garante validação automática dos dados de entrada da API.
-"""
-from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from enum import Enum
+from typing import Literal
 
-class Documento(BaseModel):
-    """Modelo para documentos do processo judicial"""
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class Document(BaseModel):
     id: str
-    dataHoraJuntada: str
-    nome: str
-    texto: str
+    dataHoraJuntada: str | None = None
+    nome: str = ""
+    texto: str = ""
 
-class ProcessoInput(BaseModel):
-    """Modelo principal para recebimento de dados do processo"""
+
+class Movement(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    dataHora: str | None = None
+    descricao: str = ""
+
+
+class CaseInput(BaseModel):
     numeroProcesso: str
-    classe: str
-    orgaoJulgador: str
-    ultimaDistribuicao: str
-    assunto: str
-    segredoJustica: bool
-    justicaGratuita: bool
-    siglaTribunal: str
-    esfera: str
-    valorCondenacao: Optional[float] = None  # Opcional para casos incompletos
-    documentos: List[Documento]
-    movimentos: List[Dict[str, Any]]
+    classe: str | None = None
+    orgaoJulgador: str | None = None
+    ultimaDistribuicao: str | None = None
+    assunto: str | None = None
+    segredoJustica: bool = False
+    justicaGratuita: bool = False
+    siglaTribunal: str | None = None
+    esfera: str | None = None
+    valorCondenacao: float | None = Field(default=None, ge=0)
+    documentos: list[Document] = Field(default_factory=list)
+    movimentos: list[Movement] = Field(default_factory=list)
+
+
+class Decision(str, Enum):
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    INCOMPLETE = "incomplete"
+
+
+class Evidence(BaseModel):
+    policy: str
+    source: str
+    excerpt: str
+
+
+class DocumentPrediction(BaseModel):
+    id: str
+    name: str
+    document_type: str
+    type_source: Literal["name", "classifier", "unknown"]
+    classifier_label: str | None = None
+    classifier_confidence: float | None = None
+    top_terms: list[str] = Field(default_factory=list)
+
+
+class CaseFacts(BaseModel):
+    final_judgment: bool = False
+    award_amount: float | None = None
+    is_labor_court: bool = False
+    plaintiff_deceased: bool = False
+    substitution_without_reservation: bool = False
+    has_merit_decision: bool = False
+    has_calculation: bool = False
+    attorney_fees: list[str] = Field(default_factory=list)
+    evidence: list[Evidence] = Field(default_factory=list)
+    source: Literal["rules", "llm", "llm+rules"] = "rules"
+
+
+class PolicyCheck(BaseModel):
+    policy: str
+    title: str
+    passed: bool
+    outcome_if_failed: Decision | None
+
 
 class AnalysisResult(BaseModel):
-    """Modelo para padronizar a resposta da análise"""
-    decision: str  # "approved", "rejected", ou "incomplete"
-    rationale: str  # Justificativa detalhada da decisão
-    citations: List[str]  # Lista de políticas aplicadas (ex: ["POL-1", "POL-3"])
+    numeroProcesso: str
+    decision: Decision
+    rationale: str
+    citations: list[str]
+    checks: list[PolicyCheck]
+    evidence: list[Evidence]
+    documents: list[DocumentPrediction]
+    facts: CaseFacts
+    extraction_source: str
+    model_version: str
+
+
+class BatchInput(BaseModel):
+    processos: list[CaseInput] = Field(min_length=1, max_length=100)
+
+
+class BatchResult(BaseModel):
+    total: int
+    summary: dict[str, int]
+    results: list[AnalysisResult]

@@ -1,20 +1,18 @@
-# Imagem base otimizada para Python
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Define diretório de trabalho
 WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 
-# Copia arquivos de dependências primeiro (otimiza cache do Docker)
 COPY requirements.txt .
-
-# Instala dependências do projeto
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia o código da aplicação
-COPY . .
+COPY app ./app
+COPY scripts ./scripts
+COPY data ./data
+COPY streamlit_app.py .
 
-# Expõe porta da API
-EXPOSE 8000
+# Treina o classificador na construção da imagem para a API subir pronta
+RUN python -m scripts.train
 
-# Comando para iniciar a aplicação
+EXPOSE 8000 8501
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

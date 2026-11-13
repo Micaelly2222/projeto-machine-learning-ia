@@ -1,0 +1,194 @@
+[
+  {
+    "name": "Federal case with final judgment and calculations",
+    "expected": "approved",
+    "case": {
+      "numeroProcesso": "0001234-56.2023.4.05.8100",
+      "classe": "Cumprimento de Sentença contra a Fazenda Pública",
+      "orgaoJulgador": "19ª VARA FEDERAL - SOBRAL/CE",
+      "esfera": "Federal",
+      "siglaTribunal": "TRF5",
+      "valorCondenacao": 15000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Ante o exposto, JULGO PROCEDENTE o pedido e condeno o INSS ao pagamento das parcelas vencidas do benefício."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "Certifico que a sentença transitou em julgado em 10/03/2024, sem recurso das partes."},
+        {"id": "DOC-3", "nome": "Planilha de Cálculos", "texto": "Principal corrigido R$ 12.400,00. Juros R$ 2.600,00. Total geral atualizado: R$ 15.000,00. Honorários contratuais de 30%: R$ 4.500,00."}
+      ],
+      "movimentos": [{"dataHora": "2024-03-10", "descricao": "Trânsito em Julgado"}]
+    }
+  },
+  {
+    "name": "Labor court case identified by the CNJ number",
+    "expected": "rejected",
+    "case": {
+      "numeroProcesso": "0100001-11.2023.5.02.0001",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Estadual",
+      "valorCondenacao": 5000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Julgo procedentes os pedidos da reclamação."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "Certifico o trânsito em julgado em 02/02/2024."},
+        {"id": "DOC-3", "nome": "Cálculos", "texto": "Total devido: R$ 5.000,00."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Award below the minimum amount",
+    "expected": "rejected",
+    "case": {
+      "numeroProcesso": "0023456-78.2022.4.05.0000",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Federal",
+      "valorCondenacao": 500.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Julgo procedente o pedido."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "Trânsito em julgado certificado: a decisão transitou em julgado em 05/05/2023."},
+        {"id": "DOC-3", "nome": "Planilha de Cálculos", "texto": "Total geral: R$ 500,00."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Sentence mentions a future final judgment, but there is no certificate",
+    "expected": "incomplete",
+    "case": {
+      "numeroProcesso": "0704321-00.2021.8.26.0100",
+      "classe": "Procedimento Comum Cível",
+      "esfera": "Estadual",
+      "valorCondenacao": 2000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença de Mérito", "texto": "Julgo procedente o pedido. Após o trânsito em julgado, arquivem-se os autos."},
+        {"id": "DOC-2", "nome": "Planilha de Cálculos", "texto": "Valor atualizado: R$ 2.000,00."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Death certificate of the plaintiff",
+    "expected": "rejected",
+    "case": {
+      "numeroProcesso": "0801122-33.2020.4.01.3600",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Federal",
+      "valorCondenacao": 42000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Acórdão", "texto": "A Turma, por unanimidade, negou provimento à apelação do INSS."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "Certifico que o acórdão transitou em julgado em 01/08/2023."},
+        {"id": "DOC-3", "nome": "Cálculos de Liquidação", "texto": "Valor total da condenação: R$ 42.000,00."},
+        {"id": "DOC-4", "nome": "Documento anexo", "texto": "Registro Civil. Certidão de óbito de Maria Silva Santos. Data do falecimento: 12/12/2023."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Substitution of powers without reservation",
+    "expected": "rejected",
+    "case": {
+      "numeroProcesso": "0005566-77.2022.4.03.6100",
+      "classe": "Execução contra a Fazenda Pública",
+      "esfera": "Federal",
+      "valorCondenacao": 28000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Julgo procedente o pedido de revisão do benefício."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "A sentença transitou em julgado em 20/01/2024."},
+        {"id": "DOC-3", "nome": "Planilha de Cálculos", "texto": "Total geral: R$ 28.000,00."},
+        {"id": "DOC-4", "nome": "Substabelecimento", "texto": "Substabeleço SEM RESERVA DE PODERES ao Dr. Paulo Lima, OAB SP 12345, os poderes outorgados pela autora."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Substitution with reservation does not block the case",
+    "expected": "approved",
+    "case": {
+      "numeroProcesso": "0005567-88.2022.4.03.6100",
+      "classe": "Execução contra a Fazenda Pública",
+      "esfera": "Federal",
+      "valorCondenacao": 9100.5,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Julgo procedente o pedido."},
+        {"id": "DOC-2", "nome": "Certidão", "texto": "Certifico que a sentença transitou em julgado em 20/01/2024."},
+        {"id": "DOC-3", "nome": "Planilha de Cálculos", "texto": "Total geral: R$ 9.100,50."},
+        {"id": "DOC-4", "nome": "Substabelecimento", "texto": "Substabeleço, COM RESERVA DE IGUAIS PODERES, ao Dr. Paulo Lima os poderes outorgados."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Amount missing everywhere",
+    "expected": "incomplete",
+    "case": {
+      "numeroProcesso": "0011223-44.2023.4.01.3600",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Federal",
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Julgo procedente o pedido."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "Certifico que a sentença transitou em julgado."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Generic document names resolved by the classifier",
+    "expected": "approved",
+    "case": {
+      "numeroProcesso": "0033445-55.2021.4.05.8000",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Federal",
+      "documentos": [
+        {"id": "DOC-1", "nome": "Documento 1", "texto": "Vistos. A parte autora requer aposentadoria por invalidez. Diante do exposto, julgo procedente o pedido e condeno o INSS a implantar o benefício e pagar os atrasados."},
+        {"id": "DOC-2", "nome": "Documento 2", "texto": "CERTIFICO E DOU FÉ que decorreu o prazo legal sem manifestação das partes, tendo a decisão transitado em julgado na data de 14/02/2024."},
+        {"id": "DOC-3", "nome": "Documento 3", "texto": "Contadoria Judicial. Apuramos o montante de R$ 31.250,00 devido à parte autora, já incluídos correção monetária e juros."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Final judgment denied in the certificate",
+    "expected": "incomplete",
+    "case": {
+      "numeroProcesso": "0044556-66.2022.4.05.8100",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Federal",
+      "valorCondenacao": 18000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Julgo procedente o pedido."},
+        {"id": "DOC-2", "nome": "Certidão", "texto": "Certifico que a sentença ainda não transitou em julgado, pois há recurso pendente de julgamento."},
+        {"id": "DOC-3", "nome": "Planilha de Cálculos", "texto": "Total geral: R$ 18.000,00."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Labor sphere informed in the case data",
+    "expected": "rejected",
+    "case": {
+      "numeroProcesso": "0000999-10.2023.8.11.0041",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Trabalhista",
+      "valorCondenacao": 7000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Sentença", "texto": "Julgo procedente a reclamação."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "Transitou em julgado em 03/03/2024."},
+        {"id": "DOC-3", "nome": "Cálculos", "texto": "Total devido: R$ 7.000,00."}
+      ],
+      "movimentos": []
+    }
+  },
+  {
+    "name": "Missing calculation spreadsheet",
+    "expected": "incomplete",
+    "case": {
+      "numeroProcesso": "0055667-77.2023.4.01.3400",
+      "classe": "Cumprimento de Sentença",
+      "esfera": "Federal",
+      "valorCondenacao": 12000.0,
+      "documentos": [
+        {"id": "DOC-1", "nome": "Acórdão", "texto": "Negaram provimento ao recurso, por unanimidade."},
+        {"id": "DOC-2", "nome": "Certidão de Trânsito em Julgado", "texto": "O acórdão transitou em julgado em 11/11/2023."}
+      ],
+      "movimentos": []
+    }
+  }
+]

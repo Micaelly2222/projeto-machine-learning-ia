@@ -1,0 +1,98 @@
+{
+  "version": "202611130830",
+  "trained_at": "2026-11-13T08:30:53+00:00",
+  "sklearn_version": "1.9.1",
+  "n_documents": 1350,
+  "classes": [
+    "acordao",
+    "calculos",
+    "certidao_obito",
+    "certidao_transito_julgado",
+    "despacho",
+    "peticao",
+    "procuracao",
+    "sentenca",
+    "substabelecimento"
+  ],
+  "holdout": {
+    "n_documents": 245,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "per_class": {
+      "acordao": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 30.0
+      },
+      "calculos": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 25.0
+      },
+      "certidao_obito": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 30.0
+      },
+      "certidao_transito_julgado": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 25.0
+      },
+      "despacho": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 25.0
+      },
+      "peticao": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 25.0
+      },
+      "procuracao": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 30.0
+      },
+      "sentenca": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 25.0
+      },
+      "substabelecimento": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 30.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 245.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 245.0
+      }
+    }
+  },
+  "cross_validation": {
+    "folds": 5,
+    "accuracy_mean": 0.865925925925926,
+    "accuracy_std": 0.06403873998978071,
+    "macro_f1_mean": 0.8471080392284811,
+    "macro_f1_std": 0.07309470080755223
+  }
+}

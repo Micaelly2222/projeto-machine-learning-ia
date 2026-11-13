@@ -1,0 +1,140 @@
+{
+  "total": 12,
+  "correct": 12,
+  "accuracy": 1.0,
+  "by_decision": {
+    "approved": 3,
+    "rejected": 5,
+    "incomplete": 4
+  },
+  "cases": [
+    {
+      "name": "Federal case with final judgment and calculations",
+      "expected": "approved",
+      "predicted": "approved",
+      "citations": [
+        "POL-1",
+        "POL-2",
+        "POL-3",
+        "POL-4",
+        "POL-5",
+        "POL-6",
+        "POL-8",
+        "POL-7"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Labor court case identified by the CNJ number",
+      "expected": "rejected",
+      "predicted": "rejected",
+      "citations": [
+        "POL-4"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Award below the minimum amount",
+      "expected": "rejected",
+      "predicted": "rejected",
+      "citations": [
+        "POL-3"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Sentence mentions a future final judgment, but there is no certificate",
+      "expected": "incomplete",
+      "predicted": "incomplete",
+      "citations": [
+        "POL-1"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Death certificate of the plaintiff",
+      "expected": "rejected",
+      "predicted": "rejected",
+      "citations": [
+        "POL-5"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Substitution of powers without reservation",
+      "expected": "rejected",
+      "predicted": "rejected",
+      "citations": [
+        "POL-6"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Substitution with reservation does not block the case",
+      "expected": "approved",
+      "predicted": "approved",
+      "citations": [
+        "POL-1",
+        "POL-2",
+        "POL-3",
+        "POL-4",
+        "POL-5",
+        "POL-6",
+        "POL-8"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Amount missing everywhere",
+      "expected": "incomplete",
+      "predicted": "incomplete",
+      "citations": [
+        "POL-2",
+        "POL-8"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Generic document names resolved by the classifier",
+      "expected": "approved",
+      "predicted": "approved",
+      "citations": [
+        "POL-1",
+        "POL-2",
+        "POL-3",
+        "POL-4",
+        "POL-5",
+        "POL-6",
+        "POL-8"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Final judgment denied in the certificate",
+      "expected": "incomplete",
+      "predicted": "incomplete",
+      "citations": [
+        "POL-1"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Labor sphere informed in the case data",
+      "expected": "rejected",
+      "predicted": "rejected",
+      "citations": [
+        "POL-4"
+      ],
+      "correct": true
+    },
+    {
+      "name": "Missing calculation spreadsheet",
+      "expected": "incomplete",
+      "predicted": "incomplete",
+      "citations": [
+        "POL-8"
+      ],
+      "correct": true
+    }
+  ]
+}

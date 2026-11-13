@@ -1,59 +1,95 @@
-import pandas as pd
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from sklearn.pipeline import Pipeline
-import joblib
-import re
-from .schemas import ProcessoInput, AnalysisResult
+import logging
+from functools import lru_cache
 
-class AnalisadorProcessos:
-    def __init__(self):
-        self.model = None
-        self.vectorizer = None
-        self._inicializar_modelo()
-    
-    def _inicializar_modelo(self):
-        """Inicializa o modelo de ML com dados de exemplo"""
-        # Pipeline simples para classificação de texto
-        self.model = Pipeline([
-            ('tfidf', TfidfVectorizer(max_features=1000)),
-            ('classifier', MultinomialNB())
-        ])
-    
-    def analisar_processo(self, texto_processo: str, politicas: str = "") -> AnalysisResult:
-        """Analisa um processo judicial e retorna a decisão"""
-        
-        # Lógica simples de análise (substituir por ML real)
-        texto = texto_processo.lower()
-        
-        # Palavras-chave para decisão (exemplo simples)
-        palavras_aprovacao = ['procedente', 'favorável', 'aceito', 'deferido']
-        palavras_rejeicao = ['improcedente', 'negado', 'indeferido', 'rejeitado']
-        palavras_incompleto = ['falta', 'incompleto', 'documentação', 'pendente']
-        
-        # Análise básica
-        if any(palavra in texto for palavra in palavras_aprovacao):
-            decisao = "approved"
-            explicacao = "Processo atende aos requisitos das políticas aplicáveis."
-        elif any(palavra in texto for palavra in palavras_rejeicao):
-            decisao = "rejected"
-            explicacao = "Processo não atende aos critérios estabelecidos."
-        elif any(palavra in texto for palavra in palavras_incompleto):
-            decisao = "incomplete"
-            explicacao = "Documentação incompleta necessita de complementação."
+from app import __version__
+from app.classifier import DocumentClassifier
+from app.config import settings
+from app.engine import decide
+from app.extraction import extract_facts, type_from_name
+from app.llm import LLMUnavailable, extract_with_llm
+from app.schemas import AnalysisResult, CaseFacts, CaseInput, DocumentPrediction
+
+logger = logging.getLogger(__name__)
+
+RISK_FACTS = ("plaintiff_deceased", "substitution_without_reservation")
+SUPPORT_FACTS = ("final_judgment", "has_merit_decision", "has_calculation")
+
+
+@lru_cache(maxsize=1)
+def get_classifier() -> DocumentClassifier:
+    if not settings.model_path.exists():
+        from scripts.train import train_and_save
+
+        logger.warning("Model not found at %s, training a new one", settings.model_path)
+        train_and_save()
+    return DocumentClassifier.load(settings.model_path)
+
+
+def classify_documents(case: CaseInput, classifier: DocumentClassifier) -> list[DocumentPrediction]:
+    if not case.documentos:
+        return []
+    texts = [f"{d.nome}. {d.texto}" for d in case.documentos]
+    predictions = classifier.predict(texts)
+    results = []
+    for doc, pred in zip(case.documentos, predictions):
+        # O nome do documento tem prioridade; o classificador cobre nomes genéricos como "Documento 1"
+        by_name = type_from_name(doc.nome)
+        if by_name:
+            doc_type, source = by_name, "name"
+        elif pred.confidence >= settings.classifier_min_confidence:
+            doc_type, source = pred.label, "classifier"
         else:
-            decisao = "incomplete"
-            explicacao = "Necessária análise manual adicional."
-        
-        return AnalysisResult(
-            decision=decisao,
-            explanation=explicacao,
-            confidence=0.85,
-            relevant_policies=politicas if politicas else "Políticas padrão aplicadas"
+            doc_type, source = "desconhecido", "unknown"
+        results.append(
+            DocumentPrediction(
+                id=doc.id,
+                name=doc.nome,
+                document_type=doc_type,
+                type_source=source,
+                classifier_label=pred.label,
+                classifier_confidence=round(pred.confidence, 4),
+                top_terms=pred.top_terms,
+            )
         )
-    
-    def treinar_modelo(self, dados_treinamento):
-        """Treina o modelo com dados históricos"""
-        # Implementar treinamento real do modelo
-        pass
+    return results
+
+
+# O LLM só complementa: todo fato vindo dele já passou pela checagem de citação.
+def merge_facts(rules: CaseFacts, llm: CaseFacts) -> CaseFacts:
+    merged = rules.model_copy(deep=True)
+    merged.source = "llm+rules"
+    for name in RISK_FACTS + SUPPORT_FACTS:
+        setattr(merged, name, getattr(rules, name) or getattr(llm, name))
+    if merged.award_amount is None:
+        merged.award_amount = llm.award_amount
+    merged.attorney_fees = rules.attorney_fees or llm.attorney_fees
+    known = {(e.policy, e.source) for e in merged.evidence}
+    merged.evidence += [e for e in llm.evidence if (e.policy, e.source) not in known]
+    return merged
+
+
+def analyze(case: CaseInput, classifier: DocumentClassifier | None = None, use_llm: bool | None = None) -> AnalysisResult:
+    classifier = classifier or get_classifier()
+    documents = classify_documents(case, classifier)
+    facts = extract_facts(case, documents)
+
+    use_llm = settings.llm_enabled if use_llm is None else use_llm
+    if use_llm:
+        try:
+            facts = merge_facts(facts, extract_with_llm(case))
+        except LLMUnavailable as exc:
+            logger.warning("LLM extraction skipped for %s: %s", case.numeroProcesso, exc)
+
+    decision, rationale, citations, checks = decide(facts)
+    return AnalysisResult(
+        numeroProcesso=case.numeroProcesso,
+        decision=decision,
+        rationale=rationale,
+        citations=citations,
+        checks=checks,
+        evidence=facts.evidence,
+        documents=documents,
+        facts=facts,
+        extraction_source=facts.source,
+        model_version=f"app {__version__} / classifier {classifier.version}",
+    )
