@@ -10,6 +10,8 @@
 
 The system reads the case data and its documents (sentences, appeals rulings, final judgment certificates, calculation spreadsheets, death certificates, powers of attorney) and returns **approved**, **rejected** or **incomplete**, the policies that decided it, and the evidence found in each document.
 
+**Live demo:** https://legal-case-analyzer-ml.streamlit.app
+
 ![Case analysis with decision, policy checks and evidence](docs/app.png)
 
 It works in three steps:
@@ -154,6 +156,8 @@ Python, scikit-learn, TF-IDF, Logistic Regression, NLP, text classification, Pan
 **Decida se um processo judicial atende a uma política de compra de crédito, com o motivo e o trecho exato do documento que sustenta cada decisão.**
 
 O sistema lê os dados do processo e seus documentos (sentenças, acórdãos, certidões de trânsito em julgado, planilhas de cálculos, certidões de óbito, procurações) e devolve **aprovado**, **rejeitado** ou **incompleto**, as políticas que decidiram e as evidências encontradas em cada documento.
+
+**Demo online:** https://legal-case-analyzer-ml.streamlit.app
 
 ![Análise de um processo com decisão, verificações e evidências](docs/app.png)
 
